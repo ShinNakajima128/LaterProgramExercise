@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
+/// <summary>
+/// ダイアログを管理するクラス
+/// </summary>
 public class DialogManager : MonoBehaviour
 {
     [SerializeField]
@@ -37,8 +39,14 @@ public class DialogManager : MonoBehaviour
         StartCoroutine(StartMessage());
     }
 
+    /// <summary>
+    /// ダイアログを表示する
+    /// </summary>
+    /// <param name="data"> ダイアログデータ </param>
+    /// <returns></returns>
     IEnumerator DisplayMessage(DialogData data)
     {
+        //プロパティをリセット
         m_endMessage = false;
         isSkip = false;
         m_clickIcon.SetActive(false);
@@ -53,11 +61,11 @@ public class DialogManager : MonoBehaviour
         {
             if (!m_endMessage)
             {
-                m_messageText.text += data.Message[_messageCount];
+                m_messageText.text += data.Message[_messageCount];  //一文字ずつ表示
                 _messageCount++;
-                yield return StartCoroutine(WaitTimer(m_textSpeed, data));
+                yield return StartCoroutine(WaitTimer(m_textSpeed));  //次の文字を表示するのを設定した時間待つ
 
-                if (isSkip)
+                if (isSkip) //スキップされたら
                 {
                     m_messageText.text = data.Message;
                     break; 
@@ -75,7 +83,7 @@ public class DialogManager : MonoBehaviour
 
         while (true)
         {
-            if (m_endMessage && Input.GetMouseButtonDown(0))
+            if (m_endMessage && Input.GetMouseButtonDown(0))    //テキストを全て表示した状態でクリックされたら
             {
                 yield break;
             }
@@ -83,7 +91,12 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    IEnumerator WaitTimer(float time, DialogData data)
+    /// <summary>
+    /// 指定した時間待機する
+    /// </summary>
+    /// <param name="time"> 待つ時間 </param>
+    /// <returns></returns>
+    IEnumerator WaitTimer(float time)
     {
         float timer = 0;
 
@@ -104,6 +117,10 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// メッセージを表示する
+    /// </summary>
+    /// <returns></returns>
     IEnumerator StartMessage()
     {
         m_display.SetActive(true);
