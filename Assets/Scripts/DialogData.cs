@@ -1,21 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DialogMasterData;
+using UnityEngine.Events;
 
 [CreateAssetMenu(menuName = "MyScriptable/Create DialogData")]
 public class DialogData : ScriptableObject
 {
     [SerializeField]
-    Sprite m_characterImage = default;
+    CharacterData[] m_characterData = default;
 
-    [SerializeField]
-    string m_characterName = default;
-
-    [SerializeField, TextArea(0, 10)]
-    string m_message = default;
-
-    public Sprite CharacterImage => m_characterImage;
-
-    public string CharacterName => m_characterName;
-    public string Message => m_message;
+    public CharacterData[] CharacterData => m_characterData;
 }
