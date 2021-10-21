@@ -48,6 +48,7 @@ public class DialogManager : MonoBehaviour
 
     void Start()
     {
+        m_display.SetActive(false);
         LoadDialogMasterData("Chara", (DialogMasterDataClass<CharacterData> m_data) => m_dialogMaster = m_data);
     }
 
@@ -87,8 +88,6 @@ public class DialogManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator DisplayMessage(DialogData data)
     {
-        yield return null;
-
         for (int n = 0; n < data.CharacterData.Length; n++)
         {
             //ダイアログをリセット
@@ -130,7 +129,6 @@ public class DialogManager : MonoBehaviour
                             m_endMessage = false;
                             break;
                         }
-                        //yield break;
                     }
                     yield return null;
                 }
