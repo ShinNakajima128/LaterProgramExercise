@@ -20,6 +20,9 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     float m_textSpeed = 1;
 
+    [SerializeField]
+    string m_playerName = default;
+    #region
     [Header("パネルの各オブジェクト")]
     [SerializeField]
     GameObject m_display = default;
@@ -38,7 +41,7 @@ public class DialogManager : MonoBehaviour
 
     [SerializeField]
     CharacterImageData[] m_imageDatas = default;
-
+    #endregion
     bool m_endMessage = false;
     bool isSkip = false;
     Coroutine m_currentCoroutine = default;
@@ -101,17 +104,17 @@ public class DialogManager : MonoBehaviour
             {
                 m_messageText.text = "";
                 int _messageCount = 0;
+                string message = data.CharacterData[n].AllMessages[i].Replace("主人公", m_playerName);
 
-
-                while (data.CharacterData[n].AllMessages[i].Length > _messageCount)
+                while (message.Length > _messageCount)
                 {
-                    m_messageText.text += data.CharacterData[n].AllMessages[i][_messageCount];  //一文字ずつ表示
+                    m_messageText.text += message[_messageCount];  //一文字ずつ表示
                     _messageCount++;
                     yield return StartCoroutine(WaitTimer(m_textSpeed));  //次の文字を表示するのを設定した時間待つ
 
                     if (isSkip) //スキップされたら
                     {
-                        m_messageText.text = data.CharacterData[n].AllMessages[i];
+                        m_messageText.text = message;
                         break;
                     }
                     yield return null;
@@ -134,8 +137,7 @@ public class DialogManager : MonoBehaviour
                 }
                 yield return null;
             }
-        }
-        
+        } 
     }
 
     Sprite SetCharaImage(string charaName)
