@@ -15,8 +15,13 @@ namespace DialogMasterData
     {
         public string Talker = default;
 
+        public int Position = default;
+
         [HideInInspector]
         public string Messages = default;
+
+        //[HideInInspector]
+        public string AnimationType = default;
 
         [SerializeField,TextArea(0, 5)]
         string[] m_allMessages = default;
