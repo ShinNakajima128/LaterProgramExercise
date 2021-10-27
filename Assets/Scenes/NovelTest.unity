@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_textSpeed: 0.05
   m_playerName: "\u307F\u3055\u304D"
   m_display: {fileID: 1255223758}
-  m_bgCtrl: {fileID: 0}
+  m_bgCtrl: {fileID: 599955422}
   m_character: []
   m_characterName: {fileID: 906749496}
   m_messageText: {fileID: 873190244}
