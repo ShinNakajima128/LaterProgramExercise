@@ -9,9 +9,6 @@ using DialogMasterData;
 /// </summary>
 public class DialogManager : MonoBehaviour
 {
-    [SerializeField]
-    bool m_isVersionUpFlag = false;
-
     [SerializeField, Header("ダイアログリスト")]
     DialogData[] m_data = default;
 
@@ -51,20 +48,31 @@ public class DialogManager : MonoBehaviour
     Coroutine m_currentCoroutine = default;
     DialogMasterDataClass<CharacterData> m_dialogMaster;
     delegate void DialogDataCallback<T>(T data);
-    Image[] m_characterImage = default;
-    Animator[] m_anim = default;
+    Image[] m_characterImage;
+    Animator[] m_anim;
 
+    public static DialogManager Instance { get; private set; }
     public CharacterData[] CharacterDataMaster => m_dialogMaster.Data;
+
+    void Awake()
+    {
+        Instance = this;
+        LoadDataFromSpreadsheet("Scenario1");
+    }
 
     void Start()
     {
+        m_characterImage = new Image[m_character.Length];
+        m_anim = new Animator[m_character.Length];
+
         for (int i = 0; i < m_character.Length; i++)
         {
-            m_anim[i] = m_character[i].GetComponent<Animator>();
+            Debug.Log(m_character[i]);
             m_characterImage[i] = m_character[i].GetComponent<Image>();
+            m_anim[i] = m_character[i].GetComponent<Animator>();
         }       
         m_display.SetActive(false);
-        LoadDialogMasterData("Chara", (DialogMasterDataClass<CharacterData> m_data) => m_dialogMaster = m_data);
+        StartCoroutine(StartMessage());
     }
 
     void SetUp()
@@ -114,14 +122,14 @@ public class DialogManager : MonoBehaviour
             yield return WaitForCharaAnimation(data.CharacterData[n].Talker, data.CharacterData[n].Position, data.CharacterData[n].AnimationType);
 
             m_display.SetActive(true);
-            m_characterName.text = data.CharacterData[n].Talker;
+            m_characterName.text = data.CharacterData[n].Talker.Replace("プレイヤー", m_playerName);
 
             for (int i = 0; i < data.CharacterData[n].AllMessages.Length; i++)
             {
                 m_clickIcon.SetActive(false);
                 m_messageText.text = "";
                 int _messageCount = 0;
-                string message = data.CharacterData[n].AllMessages[i].Replace("主人公", m_playerName);
+                string message = data.CharacterData[n].AllMessages[i].Replace("プレイヤー", m_playerName);
 
                 while (message.Length > _messageCount)
                 {
@@ -160,6 +168,11 @@ public class DialogManager : MonoBehaviour
 
     IEnumerator WaitForCharaAnimation(string charaName, int positionIndex, string animation)
     {
+        if (!m_characterImage[positionIndex].enabled)
+        {
+            m_characterImage[positionIndex].enabled = true;
+        }
+
         m_characterImage[positionIndex].sprite = SetCharaImage(charaName);
 
         if (animation != null && animation != "") //アニメーションの指定があれば
@@ -211,6 +224,29 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    public void LoadDataFromSpreadsheet(string sheetName)
+    {
+        for (int i = 0; i < m_data.Length; i++)
+        {
+            if (m_data[i].DataName == sheetName)  //プロパティとシート名が一致したら
+            {
+                LoadDialogMasterData(sheetName, (DialogMasterDataClass<CharacterData> data) =>
+                {
+                    m_data[i].CharacterData = data.Data;  //データ更新
+
+                    for (int n = 0; n < m_data[i].CharacterData.Length; n++)
+                    {
+                        m_data[i].CharacterData[n].MessagesToArray();
+                    }
+                });
+                return;
+            }
+
+        }
+        //データがロードできなかった場合
+        Debug.LogError("データをロードできませんでした");
+    }
+
     Sprite SetCharaImage(string charaName)
     {
         Sprite chara = default;
@@ -236,7 +272,7 @@ public class DialogManager : MonoBehaviour
             }
             else
             {
-
+                //if ()
             }
         }
     }
@@ -246,31 +282,18 @@ public class DialogManager : MonoBehaviour
         isAnimPlaying = false;
     }
     /// <summary>
-    /// クイズデータを読み込む
+    /// ダイアログデータを読み込む
     /// </summary>
-    /// <typeparam name="T"> クイズデータのクラス </typeparam>
-    /// <param name="file"> クイズの時代名 </param>
+    /// <typeparam name="T"> ダイアログデータのクラス </typeparam>
+    /// <param name="file"> ダイアログ名 </param>
     /// <param name="callback"></param>
     void LoadDialogMasterData<T>(string file, DialogDataCallback<T> callback)
     {
-        var data = LocalData.Load<T>(file);
-        if (m_isVersionUpFlag)
+        Network.WebRequest.Request<Network.WebRequest.GetString>("https://script.google.com/macros/s/AKfycbxkXM9so9l2drzNtbaSPIcMBJTV0_fScdRw-bVXREQdkJ8Vn1Tv/exec?sheet=" + file, Network.WebRequest.ResultType.String, (string json) =>
         {
-            Network.WebRequest.Request<Network.WebRequest.GetString>("https://script.google.com/macros/s/AKfycbxkXM9so9l2drzNtbaSPIcMBJTV0_fScdRw-bVXREQdkJ8Vn1Tv/exec?Sheet=" + file, Network.WebRequest.ResultType.String, (string json) =>
-            {
-                var dldata = JsonUtility.FromJson<T>(json);
-                LocalData.Save<T>(file, dldata);
-                callback(dldata);
-                Debug.Log("Network download. : " + file + " / " + json + "/" + dldata);
-                SetUp();
-                StartCoroutine(StartMessage());
-            });
-        }
-        else
-        {
-            Debug.Log("Local load. : " + file + " / " + data);
-            callback(data);
-            StartCoroutine(StartMessage());
-        }
+            var dldata = JsonUtility.FromJson<T>(json);
+            callback(dldata);
+            Debug.Log("Network download. : " + file + " / " + json + "/" + dldata);
+        });
     }
 }

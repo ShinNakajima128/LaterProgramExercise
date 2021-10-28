@@ -8,7 +8,11 @@ using UnityEngine.Events;
 public class DialogData : ScriptableObject
 {
     [SerializeField]
+    string m_dataName = default;
+
+    [SerializeField]
     CharacterData[] m_characterData = default;
 
-    public CharacterData[] CharacterData => m_characterData;
+    public string DataName => m_dataName;
+    public CharacterData[] CharacterData { get => m_characterData; set => m_characterData = value; }
 }

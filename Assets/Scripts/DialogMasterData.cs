@@ -17,11 +17,14 @@ namespace DialogMasterData
 
         public int Position = default;
 
+        public string AnimationType = default;
+
         [HideInInspector]
         public string Messages = default;
 
-        //[HideInInspector]
-        public string AnimationType = default;
+        public int ChoicesId = default;
+
+        public int NextId = default;
 
         [SerializeField,TextArea(0, 5)]
         string[] m_allMessages = default;

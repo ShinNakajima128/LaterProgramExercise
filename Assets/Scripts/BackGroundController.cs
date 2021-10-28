@@ -20,6 +20,9 @@ public class BackGroundController : MonoBehaviour
 
     public void Crossfade(int current, int backgroundType)
     {
+        if (current == 1)
+        {
 
+        }
     }
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d9aa4b5244f4994db385df11d119ef7, type: 3}
   m_Name: MisakiData
   m_EditorClassIdentifier: 
-  m_dataName: "\u307F\u3055\u304D"
+  m_dataName: "\u30D7\u30EC\u30A4\u30E4\u30FC"
   m_characterImages:
   - {fileID: 21300000, guid: 98d139646cb111942a0ea721e7b7b6d6, type: 3}
   - {fileID: 21300000, guid: 8e366536e1060fc4fb28d75e91cf79e2, type: 3}
