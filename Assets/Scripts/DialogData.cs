@@ -8,11 +8,19 @@ using UnityEngine.Events;
 public class DialogData : ScriptableObject
 {
     [SerializeField]
-    string m_dataName = default;
+    string m_scenarioSheetName = default;
+
+    [SerializeField]
+    string m_choicesSheetName = default;
 
     [SerializeField]
     CharacterData[] m_characterData = default;
 
-    public string DataName => m_dataName;
+    [SerializeField]
+    ChoicesData[] m_choicesData = default;
+
+    public string ScenarioSheetName => m_scenarioSheetName;
+    public string ChoicesSheetName => m_choicesSheetName;
     public CharacterData[] CharacterData { get => m_characterData; set => m_characterData = value; }
+    public ChoicesData[] ChoicesDatas { get => m_choicesData; set => m_choicesData = value; }
 }
