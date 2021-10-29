@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae764969ee966c04d872446e2b57e6db, type: 3}
   m_Name: Dialog1
   m_EditorClassIdentifier: 
-  m_dataName: Scenario1
+  m_scenarioSheetName: Scenario1
+  m_choicesSheetName: Scenario1Choices
   m_characterData:
   - Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
@@ -107,3 +108,13 @@ MonoBehaviour:
     m_allMessages:
     - "\u3042\u308C\uFF01\uFF1F\u3044\u304D\u306A\u308A\u9593\u9055\u3048\u308B\u306A\u3093\u3066\u30D7\u30EC\u30A4\u30E4\u30FC\u3061\u3083\u3093\u3082\u3057\u304B\u3057\u3066\u2026\u304A\u8179\u3059\u3044\u3066\u308B\uFF1F"
     - "\u3082\u3046\u4E00\u56DE\u3084\u308A\u76F4\u305D\u3046\u3088\uFF01\u300C\u308A\u3093\u3054\u300D\u306D\uFF01"
+  m_choicesData:
+  - ChoicesId: 1
+    Choices: "\u3054\u308A\u3089\n\u3054\u306F\u3093"
+    NextMessageId: '7
+
+      8'
+    m_allChoices:
+    - "\u3054\u308A\u3089"
+    - "\u3054\u306F\u3093"
+    m_nextId: 0700000008000000

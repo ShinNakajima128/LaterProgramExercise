@@ -37,6 +37,12 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     GameObject m_clickIcon = default;
 
+    [SerializeField]
+    GameObject m_choicesPanel = default;
+
+    [SerializeField]
+    GameObject m_choicesPrefab = default;
+
     [SerializeField, Header("キャラクターリスト")]
     CharacterImageData[] m_imageDatas = default;
     #endregion
@@ -45,6 +51,7 @@ public class DialogManager : MonoBehaviour
     bool m_endMessage = false;
     bool isSkip = false;
     bool isAnimPlaying = false;
+    bool isChoiced = false;
     Coroutine m_currentCoroutine = default;
     DialogMasterDataClass<CharacterData> m_dialogMaster;
     delegate void DialogDataCallback<T>(T data);
@@ -57,7 +64,6 @@ public class DialogManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        LoadDataFromSpreadsheet("Scenario1");
     }
 
     void Start()
@@ -70,22 +76,12 @@ public class DialogManager : MonoBehaviour
             Debug.Log(m_character[i]);
             m_characterImage[i] = m_character[i].GetComponent<Image>();
             m_anim[i] = m_character[i].GetComponent<Animator>();
-        }       
+        }
         m_display.SetActive(false);
         StartCoroutine(StartMessage());
     }
 
-    void SetUp()
-    {
-        for (int i = 0; i < m_data.Length; i++)
-        {
-            for (int n = 0; n < m_data[i].CharacterData.Length; n++)
-            {
-                m_data[i].CharacterData[n] = m_dialogMaster.Data[n];
-                m_data[i].CharacterData[n].MessagesToArray();
-            }
-        }
-    }
+
     /// <summary>
     /// メッセージを表示する
     /// </summary>
@@ -111,6 +107,7 @@ public class DialogManager : MonoBehaviour
     /// <returns></returns>
     IEnumerator DisplayMessage(DialogData data)
     {
+        m_choicesPanel.SetActive(false);
         m_display.SetActive(false);
         for (int n = 0; n < data.CharacterData.Length; n++)
         {
@@ -123,7 +120,8 @@ public class DialogManager : MonoBehaviour
 
             m_display.SetActive(true);
             m_characterName.text = data.CharacterData[n].Talker.Replace("プレイヤー", m_playerName);
-
+            EmphasisCharacter(data.CharacterData[n].Position);
+            //各キャラクターの全てのメッセージが表示し終わるまで
             for (int i = 0; i < data.CharacterData[n].AllMessages.Length; i++)
             {
                 m_clickIcon.SetActive(false);
@@ -131,6 +129,7 @@ public class DialogManager : MonoBehaviour
                 int _messageCount = 0;
                 string message = data.CharacterData[n].AllMessages[i].Replace("プレイヤー", m_playerName);
 
+                //各メッセージの
                 while (message.Length > _messageCount)
                 {
                     m_messageText.text += message[_messageCount];  //一文字ずつ表示
@@ -149,17 +148,37 @@ public class DialogManager : MonoBehaviour
 
                 yield return null;
 
-                while (true)
+                if (data.CharacterData[n].ChoicesId != 0)
                 {
-                    if (m_endMessage && Input.GetMouseButtonDown(0))    //テキストを全て表示した状態でクリックされたら
+                    m_choicesPanel.SetActive(true);
+
+                    for (int k = 0; k < data.ChoicesDatas.Length; k++)
                     {
-                        if (i < data.CharacterData[i].AllMessages.Length)
+                        if (data.ChoicesDatas[k].ChoicesId == data.CharacterData[n].ChoicesId) //IDが一致したら
                         {
-                            m_endMessage = false;
+                            CreateChoices(data.ChoicesDatas[k]);
                             break;
                         }
                     }
-                    yield return null;
+                    yield return new WaitUntil(() => isChoiced);
+
+                    m_choicesPanel.SetActive(false);
+                    isChoiced = false;
+                }
+                else
+                {
+                    while (true)
+                    {
+                        if (m_endMessage && Input.GetMouseButtonDown(0))    //テキストを全て表示した状態でクリックされたら
+                        {
+                            if (i < data.CharacterData[i].AllMessages.Length)
+                            {
+                                m_endMessage = false;
+                                break;
+                            }
+                        }
+                        yield return null;
+                    }
                 }
                 yield return null;
             }
@@ -224,11 +243,11 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    public void LoadDataFromSpreadsheet(string sheetName)
+    public void LoadCharaDataFromSpreadsheet(string sheetName)
     {
         for (int i = 0; i < m_data.Length; i++)
         {
-            if (m_data[i].DataName == sheetName)  //プロパティとシート名が一致したら
+            if (m_data[i].ScenarioSheetName == sheetName)  //プロパティとシート名が一致したら
             {
                 LoadDialogMasterData(sheetName, (DialogMasterDataClass<CharacterData> data) =>
                 {
@@ -241,12 +260,33 @@ public class DialogManager : MonoBehaviour
                 });
                 return;
             }
-
         }
         //データがロードできなかった場合
         Debug.LogError("データをロードできませんでした");
     }
 
+    public void LoadChoicesDataFromSpreadsheet(string sheetName)
+    {
+        for (int i = 0; i < m_data.Length; i++)
+        {
+            if (m_data[i].ChoicesSheetName == sheetName)  //プロパティとシート名が一致したら
+            {
+                LoadDialogMasterData(sheetName, (DialogMasterDataClass<ChoicesData> data) =>
+                {
+                    m_data[i].ChoicesDatas = data.Data;  //データ更新
+
+                    for (int n = 0; n < m_data[i].ChoicesDatas.Length; n++)
+                    {
+                        m_data[i].ChoicesDatas[n].MessagesAndNextIdToArray();
+                    }
+                });
+                return;
+            }
+        }
+        //データがロードできなかった場合
+        Debug.LogError("データをロードできませんでした");
+    }
+    
     Sprite SetCharaImage(string charaName)
     {
         Sprite chara = default;
@@ -261,22 +301,50 @@ public class DialogManager : MonoBehaviour
         }
         return chara;
     }
-    
+
+    /// <summary>
+    /// アクティブなキャラクター以外を暗転させる
+    /// </summary>
+    /// <param name="currentIndex"></param>
     void EmphasisCharacter(int currentIndex)
     {
         for (int i = 0; i < m_characterImage.Length; i++)
         {
-            if (i == currentIndex)
+            if (m_characterImage[i].enabled)
             {
-                m_characterImage[i].color = new Color(1, 1, 1);
-            }
-            else
-            {
-                //if ()
+                if (i == currentIndex)
+                {
+                    m_characterImage[i].color = new Color(1, 1, 1); //アクティブにする
+                }
+                else
+                {
+                    m_characterImage[i].color = new Color(0.5f, 0.5f, 0.5f); //非アクティブにする
+                }
             }
         }
     }
 
+    //選択肢を生成する
+    void CreateChoices(ChoicesData data)
+    {
+        for (int i = 0; i < data.AllChoices.Length; i++)
+        {
+            var c = Instantiate(m_choicesPrefab, m_choicesPanel.transform);
+            var b = c.GetComponentInChildren<Button>();
+            b.onClick.AddListener(() =>
+            {
+                isChoiced = true;
+            });
+            var t = c.GetComponentInChildren<Text>();
+            t.text = data.AllChoices[i];
+        }
+    }
+
+    //次に表示するメッセージを用意する
+    void NextMessage()
+    {
+
+    }
     void FinishReceive()
     {
         isAnimPlaying = false;
