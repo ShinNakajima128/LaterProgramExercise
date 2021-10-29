@@ -15,9 +15,14 @@ public class DialogDataCustomInspector : Editor
     {
         if (!m_dialogData) return;
 
-        if (GUILayout.Button("Update"))
+        if (GUILayout.Button("CharaUpdate"))
         {
-            DialogManager.Instance.LoadDataFromSpreadsheet(m_dialogData.DataName);
+            DialogManager.Instance.LoadCharaDataFromSpreadsheet(m_dialogData.ScenarioSheetName);
+        }
+
+        if (GUILayout.Button("ChoiceUpdate"))
+        {
+            DialogManager.Instance.LoadChoicesDataFromSpreadsheet(m_dialogData.ChoicesSheetName);
         }
         base.OnInspectorGUI();
         EditorUtility.SetDirty(m_dialogData);
