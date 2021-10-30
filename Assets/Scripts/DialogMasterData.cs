@@ -13,19 +13,14 @@ namespace DialogMasterData
     [Serializable]
     public class CharacterData
     {
+        public int MessageId = default;
         public string Talker = default;
-
         public int Position = default;
-
         public string AnimationType = default;
-
         [HideInInspector]
         public string Messages = default;
-
         public int ChoicesId = default;
-
         public int NextId = default;
-
         [SerializeField,TextArea(0, 10)]
         string[] m_allMessages = default;
 

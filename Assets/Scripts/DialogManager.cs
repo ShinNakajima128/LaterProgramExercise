@@ -48,10 +48,13 @@ public class DialogManager : MonoBehaviour
     #endregion
 
     int m_currentBackground = 0;
+    int m_nextMessageId = 0;
+    int m_AfterReactionMessageId = 0;
     bool m_endMessage = false;
     bool isSkip = false;
     bool isAnimPlaying = false;
     bool isChoiced = false;
+    bool isReactioned = false;
     Coroutine m_currentCoroutine = default;
     DialogMasterDataClass<CharacterData> m_dialogMaster;
     delegate void DialogDataCallback<T>(T data);
@@ -60,6 +63,8 @@ public class DialogManager : MonoBehaviour
 
     public static DialogManager Instance { get; private set; }
     public CharacterData[] CharacterDataMaster => m_dialogMaster.Data;
+
+    public int AfterReactionMessageId { get => m_AfterReactionMessageId; set => m_AfterReactionMessageId = value; }
 
     void Awake()
     {
@@ -109,25 +114,29 @@ public class DialogManager : MonoBehaviour
     {
         m_choicesPanel.SetActive(false);
         m_display.SetActive(false);
-        for (int n = 0; n < data.CharacterData.Length; n++)
+        int currentDialogIndex = 0;
+
+        while (currentDialogIndex < data.CharacterData.Length)
         {
             //ダイアログをリセット
             m_endMessage = false;
             isSkip = false;
 
             //キャラクターのアニメーションが終わるまで待つ
-            yield return WaitForCharaAnimation(data.CharacterData[n].Talker, data.CharacterData[n].Position, data.CharacterData[n].AnimationType);
+            yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker, 
+                                               data.CharacterData[currentDialogIndex].Position, 
+                                               data.CharacterData[currentDialogIndex].AnimationType);
 
             m_display.SetActive(true);
-            m_characterName.text = data.CharacterData[n].Talker.Replace("プレイヤー", m_playerName);
-            EmphasisCharacter(data.CharacterData[n].Position);
-            //各キャラクターの全てのメッセージが表示し終わるまで
-            for (int i = 0; i < data.CharacterData[n].AllMessages.Length; i++)
+            m_characterName.text = data.CharacterData[currentDialogIndex].Talker.Replace("プレイヤー", m_playerName);
+            EmphasisCharacter(data.CharacterData[currentDialogIndex].Position); //アクティブなキャラ以外を暗転する
+
+            for (int i = 0; i < data.CharacterData[currentDialogIndex].AllMessages.Length; i++)
             {
                 m_clickIcon.SetActive(false);
                 m_messageText.text = "";
                 int _messageCount = 0;
-                string message = data.CharacterData[n].AllMessages[i].Replace("プレイヤー", m_playerName);
+                string message = data.CharacterData[currentDialogIndex].AllMessages[i].Replace("プレイヤー", m_playerName);
 
                 //各メッセージの
                 while (message.Length > _messageCount)
@@ -143,27 +152,33 @@ public class DialogManager : MonoBehaviour
                     }
                     yield return null;
                 }
+
                 m_endMessage = true;
                 m_clickIcon.SetActive(true);
 
                 yield return null;
 
-                if (data.CharacterData[n].ChoicesId != 0)
+                if (data.CharacterData[currentDialogIndex].ChoicesId != 0)
                 {
                     m_choicesPanel.SetActive(true);
 
                     for (int k = 0; k < data.ChoicesDatas.Length; k++)
                     {
-                        if (data.ChoicesDatas[k].ChoicesId == data.CharacterData[n].ChoicesId) //IDが一致したら
+                        if (data.ChoicesDatas[k].ChoicesId == data.CharacterData[currentDialogIndex].ChoicesId) //IDが一致したら
                         {
-                            CreateChoices(data.ChoicesDatas[k]);
+                            CreateChoices(data.CharacterData, data.ChoicesDatas[k], data.ChoicesDatas[k].NextId);
                             break;
                         }
                     }
-                    yield return new WaitUntil(() => isChoiced);
+                    yield return new WaitUntil(() => isChoiced); //ボタンが押されるまで待つ
 
                     m_choicesPanel.SetActive(false);
-                    isChoiced = false;
+                    if (isChoiced && !isReactioned)
+                    {
+                        currentDialogIndex = m_nextMessageId;
+                        isChoiced = false;
+                        isReactioned = true;
+                    }
                 }
                 else
                 {
@@ -182,6 +197,18 @@ public class DialogManager : MonoBehaviour
                 }
                 yield return null;
             }
+            if (isReactioned)
+            {
+                currentDialogIndex = m_AfterReactionMessageId;
+                Debug.Log(currentDialogIndex);
+                isReactioned = false;
+            }
+            else
+            {
+                currentDialogIndex = data.CharacterData[currentDialogIndex].NextId;
+                Debug.Log(currentDialogIndex);
+            }
+            yield return null;
         }
     }
 
@@ -243,6 +270,11 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    public void SwitchIndex(int nextId)
+    {
+        m_nextMessageId = nextId;
+    }   
+    
     public void LoadCharaDataFromSpreadsheet(string sheetName)
     {
         for (int i = 0; i < m_data.Length; i++)
@@ -325,15 +357,30 @@ public class DialogManager : MonoBehaviour
     }
 
     //選択肢を生成する
-    void CreateChoices(ChoicesData data)
+    void CreateChoices(CharacterData[] characterDatas, ChoicesData data, int[] id)
     {
         for (int i = 0; i < data.AllChoices.Length; i++)
         {
             var c = Instantiate(m_choicesPrefab, m_choicesPanel.transform);
-            var b = c.GetComponentInChildren<Button>();
+            var choiceButton = c.GetComponent<ChoicesButton>();
+            choiceButton.NextMessageId = id[i];
+
+            for (int n = 0; n < characterDatas.Length; n++)
+            {
+                if (characterDatas[n].MessageId == id[i])
+                {
+                    choiceButton.AfterReactionMessageId = id[i];
+                }
+            }
+            
+            var b = c.GetComponent<Button>();
             b.onClick.AddListener(() =>
             {
                 isChoiced = true;
+                foreach (Transform child in m_choicesPanel.transform)
+                {
+                    Destroy(child.gameObject);
+                }
             });
             var t = c.GetComponentInChildren<Text>();
             t.text = data.AllChoices[i];
