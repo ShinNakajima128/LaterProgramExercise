@@ -19,8 +19,12 @@ public class DialogData : ScriptableObject
     [SerializeField]
     ChoicesData[] m_choicesData = default;
 
+    [SerializeField]
+    int m_backgroundType = default;
+
     public string ScenarioSheetName => m_scenarioSheetName;
     public string ChoicesSheetName => m_choicesSheetName;
     public CharacterData[] CharacterData { get => m_characterData; set => m_characterData = value; }
     public ChoicesData[] ChoicesDatas { get => m_choicesData; set => m_choicesData = value; }
+    public int BackgroundType { get => m_backgroundType; set => m_backgroundType = value; }
 }

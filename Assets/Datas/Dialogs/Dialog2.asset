@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae764969ee966c04d872446e2b57e6db, type: 3}
-  m_Name: Dialog1
+  m_Name: Dialog2
   m_EditorClassIdentifier: 
   m_scenarioSheetName: Scenario1
   m_choicesSheetName: Scenario1Choices
@@ -34,8 +34,8 @@ MonoBehaviour:
     Position: 0
     FaceType: '0
 
-      0'
-    m_faceTypes: 0000000000000000
+      4'
+    m_faceTypes: 0000000004000000
     AnimationType: "\u306A\u3057"
     Messages: "\u6B21\u306B\u3001\u53CB\u9054\u306E\u3086\u306B\u3066\u3043\u3061\u3083\u3093\u3092\u7D39\u4ECB\u3057\u307E\u3059\u3002\n\u3086\u306B\u3066\u3043\u3061\u3083\u3093\u3001\u3069\u3046\u305E\uFF01"
     ChoicesId: 0
@@ -87,18 +87,15 @@ MonoBehaviour:
     Position: 1
     FaceType: '4
 
-      1
-
-      4'
-    m_faceTypes: 040000000100000004000000
+      2'
+    m_faceTypes: 0400000002000000
     AnimationType: "\u306A\u3057"
-    Messages: "\u3044\u3044\u306D\uFF01\u305D\u308C\u3058\u3083\u3042\u79C1\u304B\u3089\u3044\u304F\u306D\uFF01\n\u3093\uFF5E\u2026\u3058\u3083\u3042\u2026\n\u300C\u308A\u3093\u3054\u300D\uFF01"
+    Messages: "\u3044\u3044\u306D\uFF01\u305D\u308C\u3058\u3083\u3042\u79C1\u304B\u3089\u3044\u304F\u306D\uFF01\n\u3093\uFF5E\u2026\u3058\u3083\u3042\u300C\u308A\u3093\u3054\u300D\uFF01"
     ChoicesId: 0
     NextId: 6
     m_allMessages:
     - "\u3044\u3044\u306D\uFF01\u305D\u308C\u3058\u3083\u3042\u79C1\u304B\u3089\u3044\u304F\u306D\uFF01"
-    - "\u3093\uFF5E\u2026\u3058\u3083\u3042\u2026"
-    - "\u300C\u308A\u3093\u3054\u300D\uFF01"
+    - "\u3093\uFF5E\u2026\u3058\u3083\u3042\u300C\u308A\u3093\u3054\u300D\uFF01"
   - MessageId: 6
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
@@ -135,17 +132,14 @@ MonoBehaviour:
   - MessageId: 9
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
-    FaceType: '1
-
-      4'
-    m_faceTypes: 0100000004000000
+    FaceType: 0
+    m_faceTypes: 00000000
     AnimationType: "\u306A\u3057"
-    Messages: "\u300C\u3089\u300D\u2026\u300C\u3089\u300D\u2026\n\u300C\u3089\u3063\u3071\u300D\uFF01"
+    Messages: "\u300C\u3089\u300D\u2026\u300C\u3089\u300D\u2026\u300C\u3089\u3063\u3071\u300D\uFF01"
     ChoicesId: 0
     NextId: 11
     m_allMessages:
-    - "\u300C\u3089\u300D\u2026\u300C\u3089\u300D\u2026"
-    - "\u300C\u3089\u3063\u3071\u300D\uFF01"
+    - "\u300C\u3089\u300D\u2026\u300C\u3089\u300D\u2026\u300C\u3089\u3063\u3071\u300D\uFF01"
   - MessageId: 10
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
@@ -240,4 +234,4 @@ MonoBehaviour:
     - "\u30D1\u30A4\u30F3"
     - "\u30D1\u30BB\u30EA"
     m_nextId: 0c0000000d000000
-  m_backgroundType: 0
+  m_backgroundType: 1

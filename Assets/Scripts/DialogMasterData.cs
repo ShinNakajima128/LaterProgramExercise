@@ -7,6 +7,7 @@ namespace DialogMasterData
 {
     public class DialogMasterDataClass<T>
     {
+        public int BGType;
         public T[] Data;
     }
 
@@ -16,6 +17,10 @@ namespace DialogMasterData
         public int MessageId = default;
         public string Talker = default;
         public int Position = default;
+        [HideInInspector]
+        public string FaceType = default;
+        [SerializeField]
+        int[] m_faceTypes = default;
         public string AnimationType = default;
         [HideInInspector]
         public string Messages = default;
@@ -24,12 +29,20 @@ namespace DialogMasterData
         [SerializeField,TextArea(0, 10)]
         string[] m_allMessages = default;
 
+        public int[] FaceTypes => m_faceTypes; 
         public string[] AllMessages { get => m_allMessages; set => m_allMessages = value; }
 
-        public void MessagesToArray()
+        public void MessagesAndFacetypeToArray()
         {
             string[] del = { "\n" };
             m_allMessages = Messages.Split(del, StringSplitOptions.None);
+            var f = FaceType.Split(del, StringSplitOptions.None);
+            m_faceTypes = new int[f.Length];
+
+            for (int i = 0; i < f.Length; i++)
+            {
+                m_faceTypes[i] = int.Parse(f[i]);
+            }
         }
     }
 
