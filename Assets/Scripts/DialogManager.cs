@@ -17,6 +17,14 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     float m_textSpeed = 1;
 
+    [Header("自動再生モード")]
+    [SerializeField]
+    bool isAutoflow = default;
+
+    [Header("自動再生モードで次に進むまでの時間")]
+    [SerializeField]
+    float m_autoflowTime = 1.5f;
+    
     [SerializeField]
     string m_playerName = default;
     #region DialogObject
@@ -44,6 +52,9 @@ public class DialogManager : MonoBehaviour
 
     [SerializeField]
     GameObject m_choicesPrefab = default;
+
+    [SerializeField]
+    GameObject m_Auto = default;
 
     [SerializeField, Header("キャラクターリスト")]
     CharacterImageData[] m_imageDatas = default;
@@ -201,15 +212,29 @@ public class DialogManager : MonoBehaviour
                 }
                 else
                 {
+                    float timer = default;
+
                     while (true)
                     {
-                        if (m_endMessage && IsInputed())    //テキストを全て表示した状態でクリックされたら
+                        //自動再生モードがONだったら
+                        if (isAutoflow)
                         {
-                            if (i < data.CharacterData[i].AllMessages.Length)
+                            if (m_clickIcon.activeSelf)
+                            {
+                                m_clickIcon.SetActive(false);
+                            }
+                            timer += Time.deltaTime;
+
+                            if (timer >= m_autoflowTime)
                             {
                                 m_endMessage = false;
                                 break;
                             }
+                        }
+                        if (m_endMessage && IsInputed())    //テキストを全て表示した状態でクリックされたら
+                        {
+                            m_endMessage = false;
+                            break;
                         }
                         yield return null;
                     }
@@ -317,6 +342,22 @@ public class DialogManager : MonoBehaviour
         m_nextMessageId = nextId;
     }   
     
+    public void SwitchAutoflow()
+    {
+        var anim = m_Auto.GetComponent<Animator>();
+        
+        if (!isAutoflow)
+        {
+            anim.Play("");
+            isAutoflow = true;
+        }
+        else
+        {
+            anim.Play("");
+            isAutoflow = false;
+        }
+    }
+
     Sprite SetCharaImage(string charaName, int faceType = 0)
     {
         Sprite chara = default;
