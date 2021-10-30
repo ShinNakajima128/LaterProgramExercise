@@ -55,14 +55,10 @@ public class DialogManager : MonoBehaviour
     bool isChoiced = false;
     bool isReactioned = false;
     Coroutine m_currentCoroutine = default;
-    DialogMasterDataClass<CharacterData> m_dialogMaster;
-    delegate void DialogDataCallback<T>(T data);
     Image[] m_characterImage;
     Animator[] m_anim;
 
     public static DialogManager Instance { get; private set; }
-    public CharacterData[] CharacterDataMaster => m_dialogMaster.Data;
-
     public int AfterReactionMessageId { get => m_AfterReactionMessageId; set => m_AfterReactionMessageId = value; }
 
     void Awake()
@@ -315,51 +311,6 @@ public class DialogManager : MonoBehaviour
         m_nextMessageId = nextId;
     }   
     
-    public void LoadCharaDataFromSpreadsheet(string sheetName)
-    {
-        for (int i = 0; i < m_data.Length; i++)
-        {
-            if (m_data[i].ScenarioSheetName == sheetName)  //プロパティとシート名が一致したら
-            {
-                LoadDialogMasterData(sheetName, (DialogMasterDataClass<CharacterData> data) =>
-                {
-                    m_data[i].BackgroundType = data.BGType;
-                    m_data[i].CharacterData = data.Data;  //データ更新
-
-                    for (int n = 0; n < m_data[i].CharacterData.Length; n++)
-                    {
-                        m_data[i].CharacterData[n].MessagesAndFacetypeToArray();
-                    }
-                });
-                return;
-            }
-        }
-        //データがロードできなかった場合
-        Debug.LogError("データをロードできませんでした");
-    }
-
-    public void LoadChoicesDataFromSpreadsheet(string sheetName)
-    {
-        for (int i = 0; i < m_data.Length; i++)
-        {
-            if (m_data[i].ChoicesSheetName == sheetName)  //プロパティとシート名が一致したら
-            {
-                LoadDialogMasterData(sheetName, (DialogMasterDataClass<ChoicesData> data) =>
-                {
-                    m_data[i].ChoicesDatas = data.Data;  //データ更新
-
-                    for (int n = 0; n < m_data[i].ChoicesDatas.Length; n++)
-                    {
-                        m_data[i].ChoicesDatas[n].MessagesAndNextIdToArray();
-                    }
-                });
-                return;
-            }
-        }
-        //データがロードできなかった場合
-        Debug.LogError("データをロードできませんでした");
-    }
-    
     Sprite SetCharaImage(string charaName, int faceType = 0)
     {
         Sprite chara = default;
@@ -431,20 +382,5 @@ public class DialogManager : MonoBehaviour
     void FinishReceive()
     {
         isAnimPlaying = false;
-    }
-    /// <summary>
-    /// ダイアログデータを読み込む
-    /// </summary>
-    /// <typeparam name="T"> ダイアログデータのクラス </typeparam>
-    /// <param name="file"> ダイアログ名 </param>
-    /// <param name="callback"></param>
-    void LoadDialogMasterData<T>(string file, DialogDataCallback<T> callback)
-    {
-        Network.WebRequest.Request<Network.WebRequest.GetString>("https://script.google.com/macros/s/AKfycbxkXM9so9l2drzNtbaSPIcMBJTV0_fScdRw-bVXREQdkJ8Vn1Tv/exec?sheet=" + file, Network.WebRequest.ResultType.String, (string json) =>
-        {
-            var dldata = JsonUtility.FromJson<T>(json);
-            callback(dldata);
-            Debug.Log("Network download. : " + file + " / " + json + "/" + dldata);
-        });
     }
 }
