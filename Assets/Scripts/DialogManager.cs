@@ -9,10 +9,12 @@ using DialogMasterData;
 /// </summary>
 public class DialogManager : MonoBehaviour
 {
-    [SerializeField, Header("ダイアログリスト")]
+    [Header("ダイアログリスト")]
+    [SerializeField]
     DialogData[] m_data = default;
 
-    [SerializeField, Header("テキストのスピード")]
+    [Header("テキストのスピード")]
+    [SerializeField]
     float m_textSpeed = 1;
 
     [SerializeField]
@@ -93,14 +95,15 @@ public class DialogManager : MonoBehaviour
         {
             if (i == 0)
             {
-                m_bgCtrl.Setup(m_data[i].BackgroundType);
+                m_bgCtrl.Setup(m_data[i].BackgroundType); //最初の背景をセットする
             }
             else
             {
-                m_bgCtrl.Crossfade(m_data[i].BackgroundType);
+                m_bgCtrl.Crossfade(m_data[i].BackgroundType); //次のダイアログの背景にクロスフェードする
                 isAnimPlaying = true;
                 BackGroundController.BackgroundAnim += FinishReceive;
 
+                //クロスフェードが終わるまで待つ
                 while (isAnimPlaying)
                 {
                     yield return null;
@@ -111,6 +114,7 @@ public class DialogManager : MonoBehaviour
             m_currentCoroutine = StartCoroutine(DisplayMessage(m_data[i]));
             yield return m_currentCoroutine;
         }
+        //全てのダイアログが終了したらこの下の処理が行われる
         m_display.SetActive(false);
     }
 
@@ -187,9 +191,10 @@ public class DialogManager : MonoBehaviour
 
                     m_choicesPanel.SetActive(false); //選択肢画面を非表示にする
 
+                    //選択肢を選択した直後だったら
                     if (isChoiced && !isReactioned)
                     {
-                        currentDialogIndex = m_nextMessageId;
+                        currentDialogIndex = m_nextMessageId; //選択した項目に対応したメッセージに次に表示する
                         isChoiced = false;
                         isReactioned = true;
                     }
@@ -198,7 +203,7 @@ public class DialogManager : MonoBehaviour
                 {
                     while (true)
                     {
-                        if (m_endMessage && Input.GetMouseButtonDown(0))    //テキストを全て表示した状態でクリックされたら
+                        if (m_endMessage && IsInputed())    //テキストを全て表示した状態でクリックされたら
                         {
                             if (i < data.CharacterData[i].AllMessages.Length)
                             {
@@ -211,6 +216,7 @@ public class DialogManager : MonoBehaviour
                 }
                 yield return null;
             }
+            //選択肢に対応したメッセージが表示済みだったら
             if (isReactioned)
             {
                 currentDialogIndex = m_AfterReactionMessageId;
@@ -222,7 +228,7 @@ public class DialogManager : MonoBehaviour
             }
             yield return null;
         }
-
+        //ダイアログの内容が全て終了したら表示中のキャラクターをフェードアウトさせ、フェードが終了するまで待つ。
         yield return WaitForFinishDialogFadeOut();
     }
 
@@ -248,7 +254,7 @@ public class DialogManager : MonoBehaviour
 
         while (isAnimPlaying) //アニメーションが終わるまで待つ
         {
-            if (Input.GetMouseButtonDown(0))
+            if (IsInputed())
             {
                 m_anim[positionIndex].Play("Idle");
                 isAnimPlaying = false;
@@ -296,7 +302,7 @@ public class DialogManager : MonoBehaviour
             {
                 yield break;
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (IsInputed())
             {
                 isSkip = true;
                 yield break;
@@ -376,6 +382,22 @@ public class DialogManager : MonoBehaviour
             });
             var t = c.GetComponentInChildren<Text>();
             t.text = data.AllChoices[i];
+        }
+    }
+
+    /// <summary>
+    /// 入力判定を行う
+    /// </summary>
+    /// <returns> 入力判定 </returns>
+    bool IsInputed()
+    {
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
