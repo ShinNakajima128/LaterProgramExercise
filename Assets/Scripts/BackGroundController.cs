@@ -26,6 +26,12 @@ public class BackGroundController : MonoBehaviour
         m_backgrounds[0].sprite = m_backgroundTypes[backgroundType];
     }
 
+    public void FadeIn(int backgroundType)
+    {
+        m_backgrounds[1].sprite = m_backgroundTypes[backgroundType];
+        m_anim.Play("BackgroundFadeIn");
+    }
+
     public void Crossfade(int backgroundType)
     {
         if (m_currentBackground == 0)
