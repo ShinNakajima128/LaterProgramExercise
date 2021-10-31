@@ -51,7 +51,7 @@ public class DialogManager : MonoBehaviour
     GameObject m_choicesPrefab = default;
 
     [SerializeField]
-    GameObject m_Auto = default;
+    GameObject m_logPanel = default;
 
     [SerializeField, Header("キャラクターリスト")]
     CharacterImageData[] m_imageDatas = default;
@@ -65,7 +65,7 @@ public class DialogManager : MonoBehaviour
     bool isAnimPlaying = false;
     bool isChoiced = false;
     bool isReactioned = false;
-    Coroutine m_currentCoroutine = default;
+    IEnumerator m_currentCoroutine = default;
     Image[] m_characterImage;
     Animator[] m_anim;
     #endregion
@@ -124,7 +124,7 @@ public class DialogManager : MonoBehaviour
                 BackGroundController.BackgroundAnim -= FinishReceive;
             }
 
-            m_currentCoroutine = StartCoroutine(DisplayMessage(m_data[i]));
+            m_currentCoroutine = DisplayMessage(m_data[i]);
             yield return m_currentCoroutine;
         }
         //全てのダイアログが終了したらこの下の処理が行われる
@@ -344,6 +344,35 @@ public class DialogManager : MonoBehaviour
     }
     #endregion
 
+    /// <summary>
+    /// 会話ログを表示する
+    /// </summary>
+    public void OpenLog()
+    {
+        m_logPanel.SetActive(true);
+
+        //クリックアイコンが点滅していたら目立つので非表示にする
+        if (m_clickIcon.activeSelf)
+        {
+            m_clickIcon.SetActive(false);
+        }
+        StopCoroutine(m_currentCoroutine); //再生中のコルーチンを一時停止
+    }
+
+    /// <summary>
+    /// 会話ログを閉じる
+    /// </summary>
+    public void CloseLog()
+    {
+        m_logPanel.SetActive(false);
+
+        if (m_endMessage)
+        {
+            m_clickIcon.SetActive(true);
+        }
+        StartCoroutine(m_currentCoroutine); //コルーチン再開
+    }
+
     public void SwitchIndex(int nextId)
     {
         m_nextMessageId = nextId;
@@ -386,7 +415,12 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    //選択肢を生成する
+    /// <summary>
+    /// 選択肢を生成する
+    /// </summary>
+    /// <param name="characterDatas"> キャラクターのデータ </param>
+    /// <param name="data"> 選択肢のデータ </param>
+    /// <param name="id"> 選択肢を押した後に表示するメッセージのID </param>
     void CreateChoices(CharacterData[] characterDatas, ChoicesData data, int[] id)
     {
         for (int i = 0; i < data.AllChoices.Length; i++)
