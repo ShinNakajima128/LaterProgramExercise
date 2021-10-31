@@ -53,6 +53,9 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     GameObject m_logPanel = default;
 
+    [SerializeField]
+    Text m_logText = default;
+
     [SerializeField, Header("キャラクターリスト")]
     CharacterImageData[] m_imageDatas = default;
     #endregion
@@ -60,6 +63,7 @@ public class DialogManager : MonoBehaviour
     #region field
     int m_nextMessageId = 0;
     int m_AfterReactionMessageId = 0;
+    string m_tempLog = "";
     bool m_endMessage = false;
     bool isSkip = false;
     bool isAnimPlaying = false;
@@ -76,6 +80,7 @@ public class DialogManager : MonoBehaviour
     public int AfterReactionMessageId { get => m_AfterReactionMessageId; set => m_AfterReactionMessageId = value; }
     #endregion
 
+    #region Unity function
     void Awake()
     {
         Instance = this;
@@ -94,38 +99,41 @@ public class DialogManager : MonoBehaviour
         m_display.SetActive(false);
         StartCoroutine(StartMessage());
     }
+    #endregion
 
-    #region Coroutine
+    #region coroutine
     /// <summary>
     /// メッセージを表示する
     /// </summary>
     /// <returns></returns>
     IEnumerator StartMessage()
     {
-        m_display.SetActive(true);
-
         for (int i = 0; i < m_data.Length; i++)
         {
+            BackGroundController.BackgroundAnim += FinishReceive;
+
             if (i == 0)
             {
                 m_bgCtrl.Setup(m_data[i].BackgroundType); //最初の背景をセットする
+                m_bgCtrl.FadeIn(m_data[i].BackgroundType); //フェードイン
+                isAnimPlaying = true;
             }
             else
             {
                 m_bgCtrl.Crossfade(m_data[i].BackgroundType); //次のダイアログの背景にクロスフェードする
                 isAnimPlaying = true;
-                BackGroundController.BackgroundAnim += FinishReceive;
-
-                //クロスフェードが終わるまで待つ
-                while (isAnimPlaying)
-                {
-                    yield return null;
-                }
-                BackGroundController.BackgroundAnim -= FinishReceive;
+                    
             }
+            //Animationが終わるまで待つ
+            while (isAnimPlaying)
+            {
+                yield return null;
+            }
+            BackGroundController.BackgroundAnim -= FinishReceive;
 
             m_currentCoroutine = DisplayMessage(m_data[i]);
             yield return m_currentCoroutine;
+            Debug.Log("Test");
         }
         //全てのダイアログが終了したらこの下の処理が行われる
         m_display.SetActive(false);
@@ -155,6 +163,7 @@ public class DialogManager : MonoBehaviour
 
             m_display.SetActive(true);
             m_characterName.text = data.CharacterData[currentDialogIndex].Talker.Replace("プレイヤー", m_playerName);
+            m_tempLog += m_characterName.text + "：";
             EmphasisCharacter(data.CharacterData[currentDialogIndex].Position); //アクティブなキャラ以外を暗転する
 
             for (int i = 0; i < data.CharacterData[currentDialogIndex].AllMessages.Length; i++)
@@ -182,7 +191,6 @@ public class DialogManager : MonoBehaviour
                     }
                     yield return null;
                 }
-
                 m_endMessage = true;
 
                 //自動再生モードがOFFならクリックアイコンを表示
@@ -244,6 +252,15 @@ public class DialogManager : MonoBehaviour
                             break;
                         }
                         yield return null;
+                    }
+
+                    if (i < data.CharacterData[currentDialogIndex].AllMessages.Length - 1)
+                    {
+                        m_tempLog += message + "\n" + new string('　', m_characterName.text.Length) + "　";
+                    }
+                    else
+                    {
+                        m_tempLog += message + "\n";
                     }
                 }
                 yield return null;
@@ -344,13 +361,14 @@ public class DialogManager : MonoBehaviour
     }
     #endregion
 
+    #region public function
     /// <summary>
     /// 会話ログを表示する
     /// </summary>
     public void OpenLog()
     {
         m_logPanel.SetActive(true);
-
+        m_logText.text = m_tempLog;
         //クリックアイコンが点滅していたら目立つので非表示にする
         if (m_clickIcon.activeSelf)
         {
@@ -377,7 +395,9 @@ public class DialogManager : MonoBehaviour
     {
         m_nextMessageId = nextId;
     }
+#endregion
 
+    #region private function
     Sprite SetCharaImage(string charaName, int faceType = 0)
     {
         Sprite chara = default;
@@ -471,4 +491,5 @@ public class DialogManager : MonoBehaviour
     {
         isAnimPlaying = false;
     }
+    #endregion
 }
