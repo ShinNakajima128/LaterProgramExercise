@@ -9,6 +9,7 @@ using DialogMasterData;
 /// </summary>
 public class DialogManager : MonoBehaviour
 {
+    #region serialize field
     [Header("ダイアログリスト")]
     [SerializeField]
     DialogData[] m_data = default;
@@ -17,17 +18,13 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     float m_textSpeed = 1;
 
-    [Header("自動再生モード")]
-    [SerializeField]
-    bool isAutoflow = default;
-
     [Header("自動再生モードで次に進むまでの時間")]
     [SerializeField]
     float m_autoflowTime = 1.5f;
-    
+
     [SerializeField]
     string m_playerName = default;
-    #region DialogObject
+
     [Header("パネルの各オブジェクト")]
     [SerializeField]
     GameObject m_display = default;
@@ -60,6 +57,7 @@ public class DialogManager : MonoBehaviour
     CharacterImageData[] m_imageDatas = default;
     #endregion
 
+    #region field
     int m_nextMessageId = 0;
     int m_AfterReactionMessageId = 0;
     bool m_endMessage = false;
@@ -70,9 +68,13 @@ public class DialogManager : MonoBehaviour
     Coroutine m_currentCoroutine = default;
     Image[] m_characterImage;
     Animator[] m_anim;
+    #endregion
 
+    #region property
     public static DialogManager Instance { get; private set; }
+    public bool IsAutoflow { get; set; }
     public int AfterReactionMessageId { get => m_AfterReactionMessageId; set => m_AfterReactionMessageId = value; }
+    #endregion
 
     void Awake()
     {
@@ -147,8 +149,8 @@ public class DialogManager : MonoBehaviour
             isSkip = false;
 
             //キャラクターのアニメーションが終わるまで待つ
-            yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker, 
-                                               data.CharacterData[currentDialogIndex].Position, 
+            yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker,
+                                               data.CharacterData[currentDialogIndex].Position,
                                                data.CharacterData[currentDialogIndex].AnimationType);
 
             m_display.SetActive(true);
@@ -182,7 +184,12 @@ public class DialogManager : MonoBehaviour
                 }
 
                 m_endMessage = true;
-                m_clickIcon.SetActive(true); //クリックアイコンを表示する
+
+                //自動再生モードがOFFならクリックアイコンを表示
+                if (!IsAutoflow)
+                {
+                    m_clickIcon.SetActive(true);
+                }
 
                 yield return null;
 
@@ -217,7 +224,7 @@ public class DialogManager : MonoBehaviour
                     while (true)
                     {
                         //自動再生モードがONだったら
-                        if (isAutoflow)
+                        if (IsAutoflow)
                         {
                             if (m_clickIcon.activeSelf)
                             {
@@ -340,22 +347,6 @@ public class DialogManager : MonoBehaviour
     public void SwitchIndex(int nextId)
     {
         m_nextMessageId = nextId;
-    }   
-    
-    public void SwitchAutoflow()
-    {
-        var anim = m_Auto.GetComponent<Animator>();
-        
-        if (!isAutoflow)
-        {
-            anim.Play("");
-            isAutoflow = true;
-        }
-        else
-        {
-            anim.Play("");
-            isAutoflow = false;
-        }
     }
 
     Sprite SetCharaImage(string charaName, int faceType = 0)
@@ -411,7 +402,7 @@ public class DialogManager : MonoBehaviour
                     choiceButton.AfterReactionMessageId = id[i];
                 }
             }
-            
+
             var b = c.GetComponent<Button>();
             b.onClick.AddListener(() =>
             {
