@@ -22,13 +22,13 @@ public class AutoflowButton : MonoBehaviour
     {
         if (!DialogManager.Instance.IsAutoflow)
         {
-            m_autoflowText.text = "自動再生ON";
+            m_autoflowText.text = "オートON";
             m_anim?.Play("ON");
             DialogManager.Instance.IsAutoflow = true;
         }
         else
         {
-            m_autoflowText.text = "自動再生OFF";
+            m_autoflowText.text = "オートOFF";
             m_anim?.Play("OFF");
             DialogManager.Instance.IsAutoflow = false;
         }
