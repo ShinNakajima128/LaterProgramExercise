@@ -159,7 +159,7 @@ public class DialogManager : MonoBehaviour
             //キャラクターのアニメーションが終わるまで待つ
             yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker,
                                                data.CharacterData[currentDialogIndex].Position,
-                                               data.CharacterData[currentDialogIndex].AnimationType);
+                                               data.CharacterData[currentDialogIndex].StartAnimationType);
 
             m_display.SetActive(true);
             m_characterName.text = data.CharacterData[currentDialogIndex].Talker.Replace("プレイヤー", m_playerName);
@@ -265,6 +265,11 @@ public class DialogManager : MonoBehaviour
                 }
                 yield return null;
             }
+            //キャラクターのアニメーションが終わるまで待つ
+            yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker,
+                                               data.CharacterData[currentDialogIndex].Position,
+                                               data.CharacterData[currentDialogIndex].EndAnimationType);
+
             //選択肢に対応したメッセージが表示済みだったら
             if (isReactioned)
             {
@@ -275,10 +280,12 @@ public class DialogManager : MonoBehaviour
             {
                 currentDialogIndex = data.CharacterData[currentDialogIndex].NextId;
             }
-            yield return null;
+            yield return null;          
         }
+        #region FinishDialog
         //ダイアログの内容が全て終了したら表示中のキャラクターをフェードアウトさせ、フェードが終了するまで待つ。
         yield return WaitForFinishDialogFadeOut();
+        #endregion
     }
 
     IEnumerator WaitForCharaAnimation(string charaName, int positionIndex, string animation)

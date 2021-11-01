@@ -21,7 +21,8 @@ namespace DialogMasterData
         public string FaceType = default;
         [SerializeField]
         int[] m_faceTypes = default;
-        public string AnimationType = default;
+        public string StartAnimationType = default;
+        public string EndAnimationType = default;
         [HideInInspector]
         public string Messages = default;
         public int ChoicesId = default;
