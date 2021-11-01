@@ -292,7 +292,7 @@ public class DialogManager : MonoBehaviour
 
         if (animation != null && animation != "なし") //アニメーションの指定があれば
         {
-            m_anim[positionIndex].Play(animation);
+            AnimationAccordingType(animation, positionIndex);
             isAnimPlaying = true;
             CharacterPanel.CharacterAnim += FinishReceive;
         }
@@ -395,9 +395,49 @@ public class DialogManager : MonoBehaviour
     {
         m_nextMessageId = nextId;
     }
-#endregion
+    #endregion
 
     #region private function
+    /// <summary>
+    /// 入力されたデータに応じてアニメーションを再生する。アニメーションの追加を行う場合はここに記述する
+    /// </summary>
+    /// <param name="animation"> アニメーション </param>
+    /// <param name="index"> 現在アクティブのキャラクターの番号 </param>
+    void AnimationAccordingType(string animation, int index)
+    {
+        switch (animation)
+        {
+            case "FadeIn":
+                m_anim[index].Play("FadeIn");
+                break;
+            case "FadeOut":
+                m_anim[index].Play("FadeOut");
+                break;
+            case "AllFadeIn":
+                for (int i = 0; i < m_characterImage.Length; i++)
+                {
+                    if (!m_characterImage[i].enabled)
+                    {
+                        m_characterImage[i].enabled = true;
+                    }
+                    m_anim[i].Play("FadeIn");
+                }
+                break;
+            case "AllFadeOut":
+                for (int i = 0; i < m_characterImage.Length; i++)
+                {
+                    if (!m_characterImage[i].enabled)
+                    {
+                        m_characterImage[i].enabled = true;
+                    }
+                    m_anim[i].Play("FadeOut");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     Sprite SetCharaImage(string charaName, int faceType = 0)
     {
         Sprite chara = default;
