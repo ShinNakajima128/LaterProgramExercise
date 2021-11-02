@@ -122,8 +122,8 @@ public class DialogManager : MonoBehaviour
             {
                 m_bgCtrl.Crossfade(m_data[i].BackgroundType); //次のダイアログの背景にクロスフェードする
                 isAnimPlaying = true;
-                    
             }
+
             //Animationが終わるまで待つ
             while (isAnimPlaying)
             {
@@ -133,7 +133,6 @@ public class DialogManager : MonoBehaviour
 
             m_currentCoroutine = DisplayMessage(m_data[i]);
             yield return m_currentCoroutine;
-            Debug.Log("Test");
         }
         //全てのダイアログが終了したらこの下の処理が行われる
         m_display.SetActive(false);
@@ -284,7 +283,7 @@ public class DialogManager : MonoBehaviour
             {
                 currentDialogIndex = data.CharacterData[currentDialogIndex].NextId;
             }
-            yield return null;          
+            yield return null;
         }
         #region FinishDialog
         //ダイアログの内容が全て終了したら表示中のキャラクターをフェードアウトさせ、フェードが終了するまで待つ。
@@ -292,6 +291,13 @@ public class DialogManager : MonoBehaviour
         #endregion
     }
 
+    /// <summary>
+    /// アニメーションの再生が終了するまで待機する
+    /// </summary>
+    /// <param name="charaName"></param>
+    /// <param name="positionIndex"></param>
+    /// <param name="animation"></param>
+    /// <returns></returns>
     IEnumerator WaitForCharaAnimation(string charaName, int positionIndex, string animation)
     {
         if (!m_characterImage[positionIndex].enabled)
@@ -324,6 +330,10 @@ public class DialogManager : MonoBehaviour
         CharacterPanel.CharacterAnim -= FinishReceive;
     }
 
+    /// <summary>
+    /// 全てのダイアログが終了したら全てのキャラクターをフェードアウトさせる
+    /// </summary>
+    /// <returns></returns>
     IEnumerator WaitForFinishDialogFadeOut()
     {
         for (int i = 0; i < m_characterImage.Length; i++)
@@ -398,7 +408,11 @@ public class DialogManager : MonoBehaviour
         {
             m_clickIcon.SetActive(false);
         }
-        StopCoroutine(m_currentCoroutine); //再生中のコルーチンを一時停止
+
+        if (!m_choicesPanel.activeSelf)
+        {
+            Time.timeScale = 0f; //再生中のコルーチンを一時停止
+        }
     }
 
     /// <summary>
@@ -412,7 +426,11 @@ public class DialogManager : MonoBehaviour
         {
             m_clickIcon.SetActive(true);
         }
-        StartCoroutine(m_currentCoroutine); //コルーチン再開
+
+        if (!m_choicesPanel.activeSelf)
+        {
+            Time.timeScale = 1f; //コルーチン再開
+        }
     }
 
     /// <summary>
@@ -560,6 +578,12 @@ public class DialogManager : MonoBehaviour
     /// <returns> 入力判定 </returns>
     bool IsInputed()
     {
+        //会話ログが表示されていたらfalseを返す
+        if (Time.timeScale == 0)
+        {
+            return false;
+        }
+
         //左クリック、Spaceキー、Enterキーのいずれかが押されたらtrueを返す
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
         {
