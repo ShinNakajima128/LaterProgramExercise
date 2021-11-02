@@ -65,7 +65,7 @@ public class DialogManager : MonoBehaviour
     int m_AfterReactionMessageId = 0;
     string m_tempLog = "";
     bool m_endMessage = false;
-    bool isSkip = false;
+    bool isClicked = false;
     bool isAnimPlaying = false;
     bool isChoiced = false;
     bool isReactioned = false;
@@ -154,7 +154,7 @@ public class DialogManager : MonoBehaviour
         {
             //ダイアログをリセット
             m_endMessage = false;
-            isSkip = false;
+            isClicked = false;
 
             //キャラクターのアニメーションが終わるまで待つ
             yield return WaitForCharaAnimation(data.CharacterData[currentDialogIndex].Talker,
@@ -166,12 +166,16 @@ public class DialogManager : MonoBehaviour
             m_tempLog += m_characterName.text + "：";
             EmphasisCharacter(data.CharacterData[currentDialogIndex].Position); //アクティブなキャラ以外を暗転する
 
+            //各キャラクターの全てのメッセージを順に表示する
             for (int i = 0; i < data.CharacterData[currentDialogIndex].AllMessages.Length; i++)
             {
+                //キャラクターの表情の変更があればここで変更
                 if (m_characterImage[data.CharacterData[currentDialogIndex].Position].enabled)
                 {
                     m_characterImage[data.CharacterData[currentDialogIndex].Position].sprite = SetCharaImage(data.CharacterData[currentDialogIndex].Talker, data.CharacterData[currentDialogIndex].FaceTypes[i]);
                 }
+
+                //表示されたメッセージをリセット
                 m_clickIcon.SetActive(false);
                 m_messageText.text = "";
                 int _messageCount = 0;
@@ -184,7 +188,7 @@ public class DialogManager : MonoBehaviour
                     _messageCount++;
                     yield return WaitTimer(m_textSpeed);  //次の文字を表示するのを設定した時間待つ
 
-                    if (isSkip) //スキップされたら
+                    if (isClicked) //表示中にクリックされたら現在のメッセージを全て表示して処理を中断する
                     {
                         m_messageText.text = message;
                         break;
@@ -246,7 +250,7 @@ public class DialogManager : MonoBehaviour
                                 break;
                             }
                         }
-                        if (m_endMessage && IsInputed())    //テキストを全て表示した状態でクリックされたら
+                        if (m_endMessage && IsInputed()) //テキストを全て表示した状態でクリックされたら
                         {
                             m_endMessage = false;
                             break;
@@ -360,11 +364,24 @@ public class DialogManager : MonoBehaviour
             }
             else if (IsInputed())
             {
-                isSkip = true;
+                isClicked = true;
                 yield break;
             }
             yield return null;
         }
+    }
+
+    /// <summary>
+    /// スキップ判定
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator SkipDecision(int currentId)
+    {
+        for (int i = currentId; i < m_character.Length; i++)
+        {
+
+        }
+        yield break;
     }
     #endregion
 
@@ -398,6 +415,10 @@ public class DialogManager : MonoBehaviour
         StartCoroutine(m_currentCoroutine); //コルーチン再開
     }
 
+    /// <summary>
+    /// 次に表示するメッセージを切り替える
+    /// </summary>
+    /// <param name="nextId"> 次に表示するメッセージのID </param>
     public void SwitchIndex(int nextId)
     {
         m_nextMessageId = nextId;
@@ -445,6 +466,12 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// キャラクターのImageをセットする
+    /// </summary>
+    /// <param name="charaName"> キャラクター名 </param>
+    /// <param name="faceType"> 表情のタイプ </param>
+    /// <returns></returns>
     Sprite SetCharaImage(string charaName, int faceType = 0)
     {
         Sprite chara = default;
@@ -490,12 +517,14 @@ public class DialogManager : MonoBehaviour
     /// <param name="id"> 選択肢を押した後に表示するメッセージのID </param>
     void CreateChoices(CharacterData[] characterDatas, ChoicesData data, int[] id)
     {
+        //選択肢の数だけボタンを生成
         for (int i = 0; i < data.AllChoices.Length; i++)
         {
             var c = Instantiate(m_choicesPrefab, m_choicesPanel.transform);
             var choiceButton = c.GetComponent<ChoicesButton>();
             choiceButton.NextMessageId = id[i];
 
+            //各ボタンに選択された項目に応じたメッセージのIDをセット
             for (int n = 0; n < characterDatas.Length; n++)
             {
                 if (characterDatas[n].MessageId == id[i])
@@ -505,14 +534,21 @@ public class DialogManager : MonoBehaviour
             }
 
             var b = c.GetComponent<Button>();
+
+            //ボタンがクリックされた時の機能をセットする
             b.onClick.AddListener(() =>
             {
+                //クリックフラグをON
                 isChoiced = true;
+
+                //生成した選択肢を全て消去
                 foreach (Transform child in m_choicesPanel.transform)
                 {
                     Destroy(child.gameObject);
                 }
             });
+
+            //選択肢の項目名をボタンオブジェクトの下にあるテキストに代入
             var t = c.GetComponentInChildren<Text>();
             t.text = data.AllChoices[i];
         }
@@ -524,6 +560,7 @@ public class DialogManager : MonoBehaviour
     /// <returns> 入力判定 </returns>
     bool IsInputed()
     {
+        //左クリック、Spaceキー、Enterキーのいずれかが押されたらtrueを返す
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
         {
             return true;
@@ -534,6 +571,7 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    //アニメーションの終了コールバック
     void FinishReceive()
     {
         isAnimPlaying = false;
