@@ -25,6 +25,17 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     string m_playerName = default;
 
+    [Header("強調する文章を判定する用の文字")]
+    [SerializeField]
+    char m_triggerChar = '#';
+
+    [Header("強調表現するためのHTMLコード")]
+    [SerializeField]
+    string m_htmlStartCode = "<color=#FF4C4C>";
+
+    [SerializeField]
+    string m_htmlEndCode = "</color>";
+
     [Header("パネルの各オブジェクト")]
     [SerializeField]
     GameObject m_display = default;
@@ -177,23 +188,48 @@ public class DialogManager : MonoBehaviour
                 //表示されたメッセージをリセット
                 m_clickIcon.SetActive(false);
                 m_messageText.text = "";
-                int _messageCount = 0;
                 string message = data.CharacterData[currentDialogIndex].AllMessages[i].Replace("プレイヤー", m_playerName);
+                bool isHighlighted = false;
 
                 //各メッセージを一文字ずつ表示する
-                while (message.Length > _messageCount)
+                foreach (var m in message)
                 {
-                    m_messageText.text += message[_messageCount];  //一文字ずつ表示
-                    _messageCount++;
-                    yield return WaitTimer(m_textSpeed);  //次の文字を表示するのを設定した時間待つ
-
-                    if (isClicked) //表示中にクリックされたら現在のメッセージを全て表示して処理を中断する
+                    if (m == m_triggerChar) //強調表現用の文字だった場合
                     {
-                        m_messageText.text = message;
+                        if (!isHighlighted) 
+                        {
+                            isHighlighted = true; //強調開始
+                        }
+                        else
+                        {
+                            isHighlighted = false; //強調終了
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        if (!isHighlighted)
+                        {
+                            //普通に文字を出力
+                            m_messageText.text += m;
+                        }
+                        else
+                        {
+                            //文字を強調するためのHTMLコードと一緒にまとめて出力
+                            m_messageText.text += m_htmlStartCode + m + m_htmlEndCode;
+                        }
+                    }
+                    yield return WaitTimer(m_textSpeed); //次の文字を表示するのを設定した時間待つ
+
+                    //表示中にクリックされたら現在のメッセージを全て表示して処理を中断する
+                    if (isClicked) 
+                    {
+                        m_messageText.text = HighlightKeyword(message);
                         break;
                     }
                     yield return null;
                 }
+
                 m_endMessage = true;
 
                 //自動再生モードがOFFならクリックアイコンを表示
@@ -485,27 +521,6 @@ public class DialogManager : MonoBehaviour
     }
 
     /// <summary>
-    /// キャラクターのImageをセットする
-    /// </summary>
-    /// <param name="charaName"> キャラクター名 </param>
-    /// <param name="faceType"> 表情のタイプ </param>
-    /// <returns></returns>
-    Sprite SetCharaImage(string charaName, int faceType = 0)
-    {
-        Sprite chara = default;
-
-        for (int i = 0; i < m_imageDatas.Length; i++)
-        {
-            if (charaName == m_imageDatas[i].CharacterName)
-            {
-                chara = m_imageDatas[i].CharacterImages[faceType];
-                break;
-            }
-        }
-        return chara;
-    }
-
-    /// <summary>
     /// アクティブなキャラクター以外を暗転させる
     /// </summary>
     /// <param name="currentIndex"></param>
@@ -572,6 +587,12 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    //アニメーションの終了コールバック
+    void FinishReceive()
+    {
+        isAnimPlaying = false;
+    }
+
     /// <summary>
     /// 入力判定を行う
     /// </summary>
@@ -595,10 +616,66 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    //アニメーションの終了コールバック
-    void FinishReceive()
+    /// <summary>
+    /// キャラクターのImageをセットする
+    /// </summary>
+    /// <param name="charaName"> キャラクター名 </param>
+    /// <param name="faceType"> 表情のタイプ </param>
+    /// <returns></returns>
+    Sprite SetCharaImage(string charaName, int faceType = 0)
     {
-        isAnimPlaying = false;
+        Sprite chara = default;
+
+        for (int i = 0; i < m_imageDatas.Length; i++)
+        {
+            if (charaName == m_imageDatas[i].CharacterName)
+            {
+                chara = m_imageDatas[i].CharacterImages[faceType];
+                break;
+            }
+        }
+        return chara;
     }
+
+    /// <summary>
+    /// メッセージの中で重要となるキーワードを強調する
+    /// </summary>
+    /// <param name="message"> メッセージ全文 </param>
+    /// <returns> 修正後のメッセージ </returns>
+    string HighlightKeyword(string message)
+    {
+        bool isHighlight = false;
+        string fixMessage = default;
+
+        foreach (var m in message)
+        {
+            if (m == m_triggerChar)
+            {
+                if (!isHighlight)
+                {
+                    isHighlight = true;
+                    continue;
+                }
+                else
+                {
+                    isHighlight = false;
+                    continue;
+                }
+            }
+            else
+            {
+                if (!isHighlight)
+                {
+                    fixMessage += m;
+                }
+                else
+                {
+                    fixMessage += m_htmlStartCode + m + m_htmlEndCode;
+                }
+            }
+        }
+        return fixMessage;
+    }
+
     #endregion
 }
