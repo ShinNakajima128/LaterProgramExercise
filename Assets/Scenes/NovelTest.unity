@@ -2806,6 +2806,8 @@ MonoBehaviour:
   m_autoflowTime: 1.5
   m_playerName: "\u307F\u3055\u304D"
   m_triggerChar: 35
+  m_htmlStartCode: <color=#FF4C4C>
+  m_htmlEndCode: </color>
   m_display: {fileID: 1255223758}
   m_bgCtrl: {fileID: 599955422}
   m_character:

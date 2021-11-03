@@ -173,7 +173,10 @@ public class DialogManager : MonoBehaviour
 
             m_display.SetActive(true);
             m_characterName.text = data.CharacterData[currentDialogIndex].Talker.Replace("プレイヤー", m_playerName);
-            m_tempLog += m_characterName.text + "：";
+            if (!isReactioned)
+            {
+                m_tempLog += m_characterName.text + "：";
+            }
             EmphasisCharacter(data.CharacterData[currentDialogIndex].Position); //アクティブなキャラ以外を暗転する
 
             //各キャラクターの全てのメッセージを順に表示する
@@ -295,11 +298,11 @@ public class DialogManager : MonoBehaviour
 
                     if (i < data.CharacterData[currentDialogIndex].AllMessages.Length - 1)
                     {
-                        m_tempLog += message + "\n" + new string('　', m_characterName.text.Length) + "　";
+                        m_tempLog += HighlightKeyword(message) + "\n" + new string('　', m_characterName.text.Length) + "　";
                     }
                     else
                     {
-                        m_tempLog += message + "\n";
+                        m_tempLog += HighlightKeyword(message) + "\n";
                     }
                 }
                 yield return null;
