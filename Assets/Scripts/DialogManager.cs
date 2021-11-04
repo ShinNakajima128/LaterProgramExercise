@@ -1,8 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DialogMasterData;
+
+public enum HighlightTextType
+{
+    None,
+    Bold,
+    Color,
+    BoldAndColor
+}
 
 /// <summary>
 /// ダイアログを管理するクラス
@@ -29,12 +38,13 @@ public class DialogManager : MonoBehaviour
     [SerializeField]
     char m_triggerChar = '#';
 
-    [Header("強調表現するためのHTMLコード")]
+    [Header("強調表現用の項目")]
     [SerializeField]
-    string m_htmlStartCode = "<color=#FF4C4C>";
+    HighlightTextType m_textType = HighlightTextType.None;
 
+    [Header("強調文字の色")]
     [SerializeField]
-    string m_htmlEndCode = "</color>";
+    Color m_HighlightTextColor = default;
 
     [Header("パネルの各オブジェクト")]
     [SerializeField]
@@ -71,9 +81,16 @@ public class DialogManager : MonoBehaviour
     CharacterImageData[] m_imageDatas = default;
     #endregion
 
+    #region public field
+    public Action ContinueDialog = default;
+    public Action EndDialog = default;
+    #endregion
+
     #region field
     int m_nextMessageId = 0;
     int m_AfterReactionMessageId = 0;
+    string m_htmlStartCode = default;
+    string m_htmlEndCode = default;
     string m_tempLog = "";
     bool m_endMessage = false;
     bool isClicked = false;
@@ -99,6 +116,7 @@ public class DialogManager : MonoBehaviour
 
     void Start()
     {
+        HighlightCodeSetup(m_textType, ColorToHex(m_HighlightTextColor));
         m_characterImage = new Image[m_character.Length];
         m_anim = new Animator[m_character.Length];
 
@@ -147,6 +165,7 @@ public class DialogManager : MonoBehaviour
         }
         //全てのダイアログが終了したらこの下の処理が行われる
         m_display.SetActive(false);
+        OnEndDialog();
     }
 
     /// <summary>
@@ -172,6 +191,7 @@ public class DialogManager : MonoBehaviour
                                                data.CharacterData[currentDialogIndex].StartAnimationType);
 
             m_display.SetActive(true);
+            OnContinueDialog();
             m_characterName.text = data.CharacterData[currentDialogIndex].Talker.Replace("プレイヤー", m_playerName);
             if (!isReactioned)
             {
@@ -590,10 +610,60 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    //アニメーションの終了コールバック
+    /// <summary>
+    /// アニメーションの終了コールバック
+    /// </summary>
     void FinishReceive()
     {
         isAnimPlaying = false;
+    }
+
+    /// <summary>
+    /// 次のダイアログが再生される前に実行されるイベント
+    /// </summary>
+    void OnContinueDialog()
+    {
+        ContinueDialog?.Invoke();
+    }
+
+    /// <summary>
+    /// 全てのダイアログが終了したら実行されるイベント
+    /// </summary>
+    void OnEndDialog()
+    {
+        EndDialog?.Invoke();
+    }
+
+    /// <summary>
+    /// 強調文字のコードのセットアップ
+    /// </summary>
+    /// <param name="textType"> 強調の種類 </param>
+    /// <param name="hex"> 16進数表記の色 </param>
+    void HighlightCodeSetup(HighlightTextType textType, string hex)
+    {
+        switch (textType)
+        {
+            //変更なし
+            case HighlightTextType.None:
+                m_htmlStartCode = "";
+                m_htmlEndCode = "";
+                break;
+            //太字のみ
+            case HighlightTextType.Bold:
+                m_htmlStartCode = "<b>";
+                m_htmlEndCode = "</b>";
+                break;
+            //色変更のみ
+            case HighlightTextType.Color:
+                m_htmlStartCode = $"<color=#{hex}>";
+                m_htmlEndCode = $"</color>";
+                break;
+            //太字と色変更
+            case HighlightTextType.BoldAndColor:
+                m_htmlStartCode = $"<b><color=#{hex}>";
+                m_htmlEndCode = $"</color></b>";
+                break;
+        }
     }
 
     /// <summary>
@@ -680,5 +750,15 @@ public class DialogManager : MonoBehaviour
         return fixMessage;
     }
 
+    /// <summary>
+    /// Colorを16進数に変換する
+    /// </summary>
+    /// <param name="color"> 色 </param>
+    /// <returns></returns>
+    string ColorToHex(Color32 color)
+    {
+        string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
+        return hex;
+    }
     #endregion
 }

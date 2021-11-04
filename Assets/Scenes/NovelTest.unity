@@ -2371,7 +2371,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1255223758
 GameObject:
@@ -2782,9 +2782,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 2076115456}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1939385701
 MonoBehaviour:
@@ -2806,8 +2807,8 @@ MonoBehaviour:
   m_autoflowTime: 1.5
   m_playerName: "\u307F\u3055\u304D"
   m_triggerChar: 35
-  m_htmlStartCode: <color=#FF4C4C>
-  m_htmlEndCode: </color>
+  m_textType: 2
+  m_HighlightTextColor: {r: 1, g: 0.1273585, b: 0.1273585, a: 1}
   m_display: {fileID: 1255223758}
   m_bgCtrl: {fileID: 599955422}
   m_character:
@@ -3389,8 +3390,8 @@ RectTransform:
   - {fileID: 2065987612}
   - {fileID: 1255223759}
   - {fileID: 488075266}
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_Father: {fileID: 1939385700}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
