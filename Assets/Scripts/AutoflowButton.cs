@@ -14,7 +14,7 @@ public class AutoflowButton : MonoBehaviour
         m_autoButton = GetComponent<Button>();
         m_autoflowText = transform.GetComponentInChildren<Text>();
         m_anim = GetComponent<Animator>();
-
+        DialogManager.Instance.ContinueDialog += ContinueAnimation;
         m_autoButton.onClick.AddListener(SwitchAutoflow);
     }
 
@@ -31,6 +31,15 @@ public class AutoflowButton : MonoBehaviour
             m_autoflowText.text = "オートOFF";
             m_anim?.Play("OFF");
             DialogManager.Instance.IsAutoflow = false;
+        }
+    }
+
+    void ContinueAnimation()
+    {
+        if (DialogManager.Instance.IsAutoflow)
+        {
+            m_autoflowText.text = "オートON";
+            m_anim?.Play("ON");
         }
     }
 }
