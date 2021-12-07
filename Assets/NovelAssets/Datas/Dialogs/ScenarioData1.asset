@@ -9,15 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae764969ee966c04d872446e2b57e6db, type: 3}
-  m_Name: Dialog1
+  m_Script: {fileID: 11500000, guid: 2cfd1c762bfb0094ba2bb45123180fd8, type: 3}
+  m_Name: ScenarioData1
   m_EditorClassIdentifier: 
+  m_spreadSheetURL: https://script.google.com/macros/s/AKfycbxkXM9so9l2drzNtbaSPIcMBJTV0_fScdRw-bVXREQdkJ8Vn1Tv/exec
   m_scenarioSheetName: Scenario1
   m_choicesSheetName: Scenario1Choices
-  m_characterData:
+  m_dialogData:
   - MessageId: 0
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 1
+    BackgroundType: 0
     FaceType: '0
 
       0'
@@ -33,6 +35,7 @@ MonoBehaviour:
   - MessageId: 1
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 1
+    BackgroundType: 0
     FaceType: '0
 
       0'
@@ -48,6 +51,7 @@ MonoBehaviour:
   - MessageId: 2
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '0
 
       0
@@ -66,6 +70,7 @@ MonoBehaviour:
   - MessageId: 3
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"
@@ -78,6 +83,7 @@ MonoBehaviour:
   - MessageId: 4
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: FadeIn
@@ -90,6 +96,7 @@ MonoBehaviour:
   - MessageId: 5
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '4
 
       1
@@ -108,6 +115,7 @@ MonoBehaviour:
   - MessageId: 6
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"
@@ -120,6 +128,7 @@ MonoBehaviour:
   - MessageId: 7
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 2
     m_faceTypes: 02000000
     StartAnimationType: "\u306A\u3057"
@@ -132,6 +141,7 @@ MonoBehaviour:
   - MessageId: 8
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 2
     m_faceTypes: 02000000
     StartAnimationType: "\u306A\u3057"
@@ -144,6 +154,7 @@ MonoBehaviour:
   - MessageId: 9
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '1
 
       4'
@@ -159,6 +170,7 @@ MonoBehaviour:
   - MessageId: 10
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '3
 
       0'
@@ -174,6 +186,7 @@ MonoBehaviour:
   - MessageId: 11
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"
@@ -186,6 +199,7 @@ MonoBehaviour:
   - MessageId: 12
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 2
     m_faceTypes: 02000000
     StartAnimationType: "\u306A\u3057"
@@ -198,6 +212,7 @@ MonoBehaviour:
   - MessageId: 13
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 2
     m_faceTypes: 02000000
     StartAnimationType: "\u306A\u3057"
@@ -210,6 +225,7 @@ MonoBehaviour:
   - MessageId: 14
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '3
 
       4'
@@ -225,6 +241,7 @@ MonoBehaviour:
   - MessageId: 15
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '1
 
       4
@@ -243,6 +260,7 @@ MonoBehaviour:
   - MessageId: 16
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"
@@ -255,6 +273,7 @@ MonoBehaviour:
   - MessageId: 17
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '5
 
       4
@@ -273,6 +292,7 @@ MonoBehaviour:
   - MessageId: 18
     Talker: "\u3086\u3046\u3053"
     Position: 2
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: FadeIn
@@ -285,6 +305,7 @@ MonoBehaviour:
   - MessageId: 19
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: 4
     m_faceTypes: 04000000
     StartAnimationType: "\u306A\u3057"
@@ -297,6 +318,7 @@ MonoBehaviour:
   - MessageId: 20
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: '0
 
       3'
@@ -312,6 +334,7 @@ MonoBehaviour:
   - MessageId: 21
     Talker: "\u3086\u3046\u3053"
     Position: 2
+    BackgroundType: 0
     FaceType: '0
 
       1'
@@ -327,6 +350,7 @@ MonoBehaviour:
   - MessageId: 22
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '4
 
       0'
@@ -342,6 +366,7 @@ MonoBehaviour:
   - MessageId: 23
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 1
     m_faceTypes: 01000000
     StartAnimationType: "\u306A\u3057"
@@ -354,6 +379,7 @@ MonoBehaviour:
   - MessageId: 24
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"
@@ -366,6 +392,7 @@ MonoBehaviour:
   - MessageId: 25
     Talker: "\u30D7\u30EC\u30A4\u30E4\u30FC"
     Position: 0
+    BackgroundType: 0
     FaceType: 3
     m_faceTypes: 03000000
     StartAnimationType: "\u306A\u3057"
@@ -378,6 +405,7 @@ MonoBehaviour:
   - MessageId: 26
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: 4
     m_faceTypes: 04000000
     StartAnimationType: "\u306A\u3057"
@@ -390,6 +418,7 @@ MonoBehaviour:
   - MessageId: 27
     Talker: "\u3086\u306B\u3066\u3043"
     Position: 1
+    BackgroundType: 0
     FaceType: '1
 
       3
@@ -408,6 +437,7 @@ MonoBehaviour:
   - MessageId: 28
     Talker: "\u3086\u3046\u3053"
     Position: 2
+    BackgroundType: 0
     FaceType: 0
     m_faceTypes: 00000000
     StartAnimationType: "\u306A\u3057"

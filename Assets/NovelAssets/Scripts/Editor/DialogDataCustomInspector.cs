@@ -1,30 +1,30 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(DialogData))]
+[CustomEditor(typeof(ScenarioData))]
 public class DialogDataCustomInspector : Editor
 {
-    DialogData m_dialogData;
+    ScenarioData m_ScenarioData;
 
     private void OnEnable()
     {
-        m_dialogData = target as DialogData;
+        m_ScenarioData = target as ScenarioData;
     }
 
     public override void OnInspectorGUI()
     {
-        if (!m_dialogData) return;
+        if (!m_ScenarioData) return;
 
         if (GUILayout.Button("CharaUpdate"))
         {
-            m_dialogData.LoadCharaDataFromSpreadsheet();
+            m_ScenarioData.LoadDialogDataFromSpreadsheet();
         }
 
         if (GUILayout.Button("ChoiceUpdate"))
         {
-            m_dialogData.LoadChoicesDataFromSpreadsheet();
+            m_ScenarioData.LoadChoicesDataFromSpreadsheet();
         }
         base.OnInspectorGUI();
-        EditorUtility.SetDirty(m_dialogData);
+        EditorUtility.SetDirty(m_ScenarioData);
     }
 }

@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace DialogMasterData
+namespace ScenarioMasterData
 {
-    public class DialogMasterDataClass<T>
+    public class ScenarioMasterDataClass<T>
     {
-        public int BGType;
         public T[] Data;
     }
 
     [Serializable]
-    public class CharacterData
+    public class DialogData
     {
         public int MessageId = default;
         public string Talker = default;
@@ -33,7 +32,6 @@ namespace DialogMasterData
 
         public int[] FaceTypes => m_faceTypes; 
         public string[] AllMessages { get => m_allMessages; set => m_allMessages = value; }
-
         public void MessagesAndFacetypeToArray()
         {
             string[] del = { "\n" };
@@ -43,7 +41,10 @@ namespace DialogMasterData
 
             for (int i = 0; i < f.Length; i++)
             {
-                m_faceTypes[i] = int.Parse(f[i]);
+                if (f[i] != "")
+                {
+                    m_faceTypes[i] = int.Parse(f[i]);
+                }               
             }
         }
     }
