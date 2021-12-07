@@ -17,6 +17,7 @@ namespace DialogMasterData
         public int MessageId = default;
         public string Talker = default;
         public int Position = default;
+        public int BackgroundType = default;
         [HideInInspector]
         public string FaceType = default;
         [SerializeField]

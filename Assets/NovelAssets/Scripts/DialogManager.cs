@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -93,6 +94,7 @@ public class DialogManager : MonoBehaviour
     string m_htmlEndCode = default;
     string m_tempLog = "";
     bool m_endMessage = false;
+    bool isSkiped = false;
     bool isClicked = false;
     bool isAnimPlaying = false;
     bool isChoiced = false;
@@ -217,9 +219,12 @@ public class DialogManager : MonoBehaviour
                 //各メッセージを一文字ずつ表示する
                 foreach (var m in message)
                 {
+                    //スキップ機能
+                    
+
                     if (m == m_triggerChar) //強調表現用の文字だった場合
                     {
-                        if (!isHighlighted) 
+                        if (!isHighlighted)
                         {
                             isHighlighted = true; //強調開始
                         }
@@ -245,14 +250,13 @@ public class DialogManager : MonoBehaviour
                     yield return WaitTimer(m_textSpeed); //次の文字を表示するのを設定した時間待つ
 
                     //表示中にクリックされたら現在のメッセージを全て表示して処理を中断する
-                    if (isClicked) 
+                    if (isClicked)
                     {
                         m_messageText.text = HighlightKeyword(message);
                         break;
                     }
                     yield return null;
                 }
-
                 m_endMessage = true;
 
                 //自動再生モードがOFFならクリックアイコンを表示
@@ -313,6 +317,7 @@ public class DialogManager : MonoBehaviour
                             m_endMessage = false;
                             break;
                         }
+                        
                         yield return null;
                     }
 
@@ -341,6 +346,29 @@ public class DialogManager : MonoBehaviour
             else
             {
                 currentDialogIndex = data.CharacterData[currentDialogIndex].NextId;
+            }
+
+            if (isSkiped)
+            {
+                for (int i = currentDialogIndex; i < data.CharacterData.Length; i++)
+                {
+                    if (i == data.CharacterData.Length - 1)
+                    {
+                        Debug.Log("Test1");
+                        currentDialogIndex = data.CharacterData[i].MessageId;
+                        break;
+                    }
+                    else if (data.CharacterData[i].ChoicesId != 0)
+                    {
+                        Debug.Log("Test2");
+                        currentDialogIndex = data.CharacterData[i].MessageId;
+                        break;
+                    }
+                }
+
+                Debug.Log(currentDialogIndex);
+                isSkiped = false;
+                break;
             }
             yield return null;
         }
@@ -441,16 +469,65 @@ public class DialogManager : MonoBehaviour
     }
 
     /// <summary>
-    /// スキップ判定
+    /// スキップする
     /// </summary>
     /// <returns></returns>
-    IEnumerator SkipDecision(int currentId)
+    IEnumerator SkipDecision(int currentId, DialogData data)
     {
-        for (int i = currentId; i < m_character.Length; i++)
+        for (int i = currentId; i < data.CharacterData.Length; i++)
         {
-
+            if (i == data.CharacterData.Length - 1)
+            {
+                Debug.Log("Test1");
+                currentId = i;
+                yield return currentId;
+                break;
+            }
+            else if (data.CharacterData[i].ChoicesId != 0)
+            {
+                Debug.Log("Test2");
+                currentId = i;
+                yield return currentId;
+                break;
+            }
         }
         yield break;
+    }
+    
+    IEnumerator WaitForAllCoroutine(IEnumerator[] enumerators)
+    {
+        //var e1 = CharacterMove(new Vector3(0, 0, 0), 3);
+        //var e2 = CharacterMove(new Vector3(0, 0, 0), 3);
+        //var e3 = CharacterMove(new Vector3(0, 0, 0), 3);
+        //var e4 = CharacterMove(new Vector3(0, 0, 0), 3);
+        //IEnumerator[] es = { e1, e2, e3, e4 };
+        //WaitForAllCoroutine(es);
+
+        bool[] nexts = new bool[enumerators.Length];
+        for (int i = 0; i < nexts.Length; i++)
+        {
+            nexts[i] = enumerators[i].MoveNext();
+        }
+        yield return null;
+
+        while (nexts.Any(e => e))
+        {
+            for (int i = 0; i < nexts.Length; i++)
+            {
+                nexts[i] = enumerators[i].MoveNext();
+            }
+            yield return null;
+        }
+    }
+
+    IEnumerator CharacterMove(Vector2 position, float time)
+    {
+        yield return null;
+    }
+
+    IEnumerator CharacterFade(float alfa, float time)
+    {
+        yield return null;
     }
     #endregion
 
@@ -499,6 +576,11 @@ public class DialogManager : MonoBehaviour
     public void SwitchIndex(int nextId)
     {
         m_nextMessageId = nextId;
+    }
+
+    public void Skip()
+    {
+        isSkiped = true;
     }
     #endregion
 
